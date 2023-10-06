@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - "80:3000"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  whoami:
+    image: traefik/whoami
+    scale: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.traefik.localhost`)"
+
+  server:
+    image: nginx:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`server.traefik.localhost`)"
